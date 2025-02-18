@@ -1,0 +1,158 @@
+class HangMan:
+    def __init__(self):
+        self.location = 'A'  # Initial location
+
+    def sense(self, environment):
+        return environment[self.location]
+
+    def act(self, perception):
+        if perception == 'Dirty':
+            return 'Suck'
+        elif self.location == 'A':
+            return 'Right'
+        else:
+            return 'Left'
+
+    def run(self, environment):
+        for _ in range(10):
+            perception = self.sense(environment)
+            action = self.act(perception)
+            print(f"Location: {self.location}, Perception: {perception}, Action: {action}")
+            if action == 'Suck':
+                environment[self.location] = 'Clean'
+            elif action == 'Right':
+                self.location = 'B'
+            elif action == 'Left':
+                self.location = 'A'
+
+
+class TableDrivenVacuumAgent:
+    def __init__(self):
+        self.location = 'A'
+        self.table = {
+            ('A', 'Dirty'): 'Suck',
+            ('A', 'Clean'): 'Right',
+            ('B', 'Dirty'): 'Suck',
+            ('B', 'Clean'): 'Left'
+        }
+
+    def sense(self, environment):
+        return environment[self.location]
+
+    def act(self, perception):
+        return self.table[(self.location, perception)]
+
+    def run(self, environment):
+        for _ in range(10):
+            perception = self.sense(environment)
+            action = self.act(perception)
+            print(f"Location: {self.location}, Perception: {perception}, Action: {action}")
+            if action == 'Suck':
+                environment[self.location] = 'Clean'
+            elif action == 'Right':
+                self.location = 'B'
+            elif action == 'Left':
+                self.location = 'A'
+
+
+class AnotherTableDrivenVacuumAgent:
+    def __init__(self):
+        self.location = 'A'
+        self.table = {
+            ('A', 'Dirty'): 'Suck',
+            ('A', 'Clean'): 'Right',
+            ('B', 'Dirty'): 'Suck',
+            ('B', 'Clean'): 'Stay'
+        }
+
+    def sense(self, environment):
+        return environment[self.location]
+
+    def act(self, perception):
+        return self.table[(self.location, perception)]
+
+    def run(self, environment):
+        for _ in range(10):
+            perception = self.sense(environment)
+            action = self.act(perception)
+            print(f"Location: {self.location}, Perception: {perception}, Action: {action}")
+            if action == 'Suck':
+                environment[self.location] = 'Clean'
+            elif action == 'Right':
+                self.location = 'B'
+            elif action == 'Stay':
+                pass
+
+
+# Water Jug Problem using BFS
+def water_jug_bfs(jug1, jug2, target):
+    visited = set()
+    queue = [(0, 0)]
+
+    while queue:
+        state = queue.pop(0)
+        (x, y) = state
+
+        print(f"Jug1: {x} Jug2: {y}")
+
+        if x == target or y == target:
+            print(f"Reached target: {target}")
+            return True
+
+        if state in visited:
+            continue
+        visited.add(state)
+
+        queue.append((jug1, y))  # Fill jug1
+        queue.append((x, jug2))  # Fill jug2
+        queue.append((0, y))     # Empty jug1
+        queue.append((x, 0))     # Empty jug2
+        queue.append((max(0, x - (jug2 - y)), min(jug2, y + x)))  # Pour jug1 -> jug2
+        queue.append((min(jug1, x + y), max(0, y - (jug1 - x))))  # Pour jug2 -> jug1
+
+    return False
+
+
+# Monkey Banana Problem using DFS
+def monkey_banana_dfs(state, goal):
+    stack = [state]
+    visited = set()
+
+    while stack:
+        current = stack.pop()
+        print(f"Monkey at: {current}")
+
+        if current == goal:
+            print("Monkey got the banana!")
+            return True
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        # Possible moves
+        stack.append((current[0] + 1, current[1]))  # Move right
+        stack.append((current[0] - 1, current[1]))  # Move left
+        stack.append((current[0], current[1] + 1))  # Move up
+        stack.append((current[0], current[1] - 1))  # Move down
+
+    return False
+
+
+print("Simple Reflex Agent:")
+simple_agent = SimpleReflexVacuumAgent()
+simple_agent.run({'A': 'Dirty', 'B': 'Dirty'})
+
+print("\nTable Driven Agent:")
+table_agent = TableDrivenVacuumAgent()
+table_agent.run({'A': 'Dirty', 'B': 'Dirty'})
+
+print("\nAnother Table Driven Agent:")
+another_table_agent = AnotherTableDrivenVacuumAgent()
+another_table_agent.run({'A': 'Dirty', 'B': 'Dirty'})
+
+print("\nWater Jug Problem:")
+water_jug_bfs(4, 3, 2)
+
+print("\nMonkey Banana Problem:")
+monkey_banana_dfs((0, 0), (2, 2))
