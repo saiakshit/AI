@@ -1,0 +1,70 @@
+class SimpleReflexVacuumAgent:
+    def __init__(self):
+        self.location = 'A'  # Initial location
+
+    def sense(self, environment):
+        return environment[self.location]
+
+    def act(self, perception):
+        if perception == 'Dirty':
+            return 'Suck'
+        elif self.location == 'A':
+            return 'Right'
+        else:
+            return 'Left'
+
+    def run(self, environment):
+        for _ in range(10):
+            perception = self.sense(environment)
+            action = self.act(perception)
+            print(f"Location: {self.location}, Perception: {perception}, Action: {action}")
+            if action == 'Suck':
+                environment[self.location] = 'Clean'
+            elif action == 'Right':
+                self.location = 'B'
+            elif action == 'Left':
+                self.location = 'A'
+
+
+class TableDrivenVacuumAgent:
+    def __init__(self):
+        self.location = 'A'
+        self.table = {
+            ('A', 'Dirty'): 'Suck',
+            ('A', 'Clean'): 'Right',
+            ('B', 'Dirty'): 'Suck',
+            ('B', 'Clean'): 'Left'
+        }
+
+    def sense(self, environment):
+        return environment[self.location]
+
+    def act(self, perception):
+        return self.table[(self.location, perception)]
+
+    def run(self, environment):
+        for _ in range(10):
+            perception = self.sense(environment)
+            action = self.act(perception)
+            print(f"Location: {self.location}, Perception: {perception}, Action: {action}")
+            if action == 'Suck':
+                environment[self.location] = 'Clean'
+            elif action == 'Right':
+                self.location = 'B'
+            elif action == 'Left':
+                self.location = 'A'
+
+
+# Example environment
+environment = {
+    'A': 'Dirty',
+    'B': 'Dirty'
+}
+
+print("Simple Reflex Agent:")
+simple_agent = SimpleReflexVacuumAgent()
+simple_agent.run(environment.copy())
+
+print("\nTable Driven Agent:")
+table_agent = TableDrivenVacuumAgent()
+table_agent.run(environment.copy())
